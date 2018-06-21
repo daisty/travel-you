@@ -1,0 +1,25 @@
+.block{
+  width: 80%;
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+}
+table.block{
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.block thead th{
+  text-align: left;
+  background: #D2E0F0;
+  padding: 10px;
+}
+.block tbody tr td:nth-of-type(odd):not([no]){
+  text-align: center;
+  background: #EFF2F7;
+  white-space: nowrap;
+  width: 130px;
+}
+.block tbody tr td:nth-of-type(even):not([no]){
+}
+.block tbody tr td{
+  padding: 10px;
+}

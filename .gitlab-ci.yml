@@ -1,0 +1,65 @@
+stages:
+  - install_deps
+  - build
+  - deploy_test
+  #- deploy_production
+variables:
+  PORT: 29095
+  MEMORY: 1200
+  REGISTRY_PRODUCT_URL: "10.8.8.85:5000"
+  REGISTRY_TEST_URL: "docker.zowoyoo.com"
+cache:
+  key: ${CI_PROJECT_NAME}
+  paths:
+    - node_modules/
+    - dist/
+
+# 安装依赖
+install_deps:
+  stage: install_deps
+  only:
+    - develop
+    - master
+  script:
+    - npm config set registry https://registry.npm.taobao.org
+    - npm config set sass_binary_site https://npm.taobao.org/mirrors/node-sass
+    - npm install
+
+
+# 编译
+build:
+  stage: build
+  only:
+    - develop
+    - master
+  script:
+    - npm run build
+    - VERSION=`grep '"version"' package.json|awk -F'"' '{print $4}'`
+    - echo ${CI_PROJECT_NAME}
+    - echo ${VERSION}
+    - docker rmi ${REGISTRY_PRODUCT_URL}/${CI_PROJECT_NAME}:${VERSION} || echo "${CI_PROJECT_NAME} not find"
+    - docker rmi  ${REGISTRY_TEST_URL}/zwy/${CI_PROJECT_NAME}:${VERSION} || echo "${CI_PROJECT_NAME} not find"
+    - docker build --no-cache -t ${CI_PROJECT_NAME}:${VERSION}_${CI_COMMIT_SHA} .
+    - docker tag ${CI_PROJECT_NAME}:${VERSION}_${CI_COMMIT_SHA} ${REGISTRY_PRODUCT_URL}/${CI_PROJECT_NAME}:${VERSION}
+    - docker tag ${CI_PROJECT_NAME}:${VERSION}_${CI_COMMIT_SHA}  ${REGISTRY_TEST_URL}/zwy/${CI_PROJECT_NAME}:${VERSION}
+    #- docker push  ${REGISTRY_PRODUCT_URL}/${CI_PROJECT_NAME}:${VERSION}
+    - docker push ${REGISTRY_TEST_URL}/zwy/${CI_PROJECT_NAME}:${VERSION}
+
+# 部署测试服务器
+deploy_test:
+  stage: deploy_test
+  only:
+    - develop
+    - master
+  script:
+    - VERSION=`grep '"version"' package.json|awk -F'"' '{print $4}'`
+    - ssh root@192.168.88.88 "/root/gitlab-ci/deploy_nginx.sh ${CI_PROJECT_NAME} ${CI_PROJECT_NAME} ${VERSION} ${PORT} ${MEMORY}"
+
+
+# 部署生产服务器
+# deploy_production:
+#  stage: deploy_production
+#  only:
+#    - master
+#  script:
+#    - bash scripts/deploy/deploy.sh

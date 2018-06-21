@@ -1,0 +1,19 @@
+/*自定义css样式*/
+.boldform label {
+  font-weight: bold;
+}
+.boldform .el-form-item{
+  margin-bottom: 8px;
+}
+.title {
+  /*background: bisque;*/
+  color: #555555;
+  font-weight: bold;
+  font-size: small;
+  background-color: #D2E0F0;
+  padding: 10px;
+  border: 0 solid #D9B04C;
+  margin-bottom: 15px;
+  padding-left: 28px;
+  background-position: 5px 5px;
+}

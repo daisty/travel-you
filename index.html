@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>自我游国际酒店</title>
+    <script>
+      if (!sessionStorage.getItem('token')) {
+        localStorage.setItem('getSession', Date.now())
+      }
+      window.addEventListener('storage', function(event) {
+        if (!event.newValue) return
+        if (event.key === 'getSession') {
+          localStorage.setItem('storeSessionData', sessionStorage.getItem('token') + '&' + sessionStorage.getItem('refreshToken'))
+          localStorage.removeItem('storeSessionData')
+        }
+        if (event.key === 'storeSessionData') {
+          var val = event.newValue.split('&')
+          sessionStorage.setItem('token', val[0])
+          sessionStorage.setItem('refreshToken', val[1])
+          localStorage.removeItem('getSession')
+        }
+      })
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
